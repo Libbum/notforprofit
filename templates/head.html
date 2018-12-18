@@ -1,0 +1,16 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="description" content="{{ config.description }}" />
+<meta name="author" content="{{ config.extra.author.name }}" />
+
+<link href="/main.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:800|Source+Sans+Pro:300,300i,600,600i" />
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+{% if page %}
+<title>{{ page.title }} &ndash; {{ config.title }}</title>
+{% else %}
+<title>{{ config.title }}</title>
+{% endif %}
+{% if config.generate_rss %}
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+{% endif %}

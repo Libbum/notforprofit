@@ -1,15 +1,15 @@
-base_url = "https://notforprofit.netlify.com"
 title = "Not For Profit"
+description = "Help the economy transition to purpose-driven system"
+base_url = "https://notforprofit.netlify.com"
 
 compile_sass = true
 highlight_code = false
 build_search_index = true
-theme = "even"
 
 taxonomies = [
     {name = "categories", rss = true},
     {name = "tags", rss = true},
 ]
 
-[extra]
-even_title = "Not For Profit"
+[extra.author]
+name = "Tim DuBois"

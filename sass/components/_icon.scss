@@ -1,0 +1,15 @@
+/* Icon */
+
+.icon {
+    border-bottom: none;
+    position: relative;
+
+    > .label {
+        display: none;
+    }
+}
+
+.menu-icon {
+    vertical-align: middle;
+    padding-bottom: 3px;
+}
