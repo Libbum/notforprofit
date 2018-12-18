@@ -1,0 +1,15 @@
+base_url = "https://notforprofit.netlify.com"
+title = "Not For Profit"
+
+compile_sass = true
+highlight_code = false
+build_search_index = true
+theme = "even"
+
+taxonomies = [
+    {name = "categories", rss = true},
+    {name = "tags", rss = true},
+]
+
+[extra]
+even_title = "Not For Profit"
