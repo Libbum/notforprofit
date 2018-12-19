@@ -43,32 +43,15 @@
 
             <section class="main">
                 <header>
-                    <h2>Mauris sed lorem</h2>
-                    <p>Aenean ornare velit lacus varius enim ullamcorper proin aliquam facilisis ante sed etiam magna interdum congue. Sed consequat amet dolor magna consequat. Lorem ipsum dolor amet nullam sed etiam veroeros.</p>
+                    <h2>Find Not For Profit Entities in Your Area</h2>
+                    <p>Businesses of interest to you are listed on the map below.</p>
                 </header>
                 <div class="inner">
-                    <ul class="faces">
-                        <li>
-                            <span class="image"><img src="/images/pic01.jpg" alt="" /></span>
-                            <h3>Jane Doe</h3>
-                            <p>Sed magna etiam</p>
-                        </li>
-                        <li>
-                            <span class="image"><img src="/images/pic02.jpg" alt="" /></span>
-                            <h3>John Smith</h3>
-                            <p>Ipsum et dolor</p>
-                        </li>
-                        <li>
-                            <span class="image"><img src="/images/pic03.jpg" alt="" /></span>
-                            <h3>Kate Anderson</h3>
-                            <p>Euismod convallis</p>
-                        </li>
-                        <li>
-                            <span class="image"><img src="/images/pic04.jpg" alt="" /></span>
-                            <h3>Alex Marks</h3>
-                            <p>Mauris aliquam</p>
-                        </li>
-                    </ul>
+                    <div id="map"></div>
+                    <div id="popup" class="ol-popup">
+                        <a href="#" id="popup-closer" class="icon"><i data-feather="x"></i></a>
+                        <div id="popup-content"></div>
+                    </div>
                 </div>
             </section>
 
@@ -156,6 +139,8 @@
         <script src="/js/browser.min.js"></script>
         <script src="/js/breakpoints.min.js"></script>
         <script src="/js/util.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+        <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
         <script src="/js/main.js"></script>
     </body>
 </html>
