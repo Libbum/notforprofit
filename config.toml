@@ -1,14 +1,14 @@
 title = "Not For Profit"
-description = "Help the economy transition to purpose-driven system"
+description = "Help the economy transition to a purpose-driven system"
 base_url = "https://notforprofit.netlify.com"
 
 compile_sass = true
 highlight_code = false
-build_search_index = true
+build_search_index = false
 
 taxonomies = [
-    {name = "categories", rss = true},
-    {name = "tags", rss = true},
+    {name = "category", rss = false},
+    {name = "tags", rss = false},
 ]
 
 [extra.author]

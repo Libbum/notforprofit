@@ -1,4 +1,6 @@
+{% block head %}
 <header id="header" class="alt">
+{% endblock head %}
     <div class="logo">
         <a href="{{ config.base_url }}"><strong>Not For Profit</strong>.Earth</a>
     </div>
@@ -6,32 +8,15 @@
         <ul>
             <li class="current"><a href="{{ config.base_url }}">Home</a></li>
             <li>
-                <a href="#" class="icon">Dropdown<i class="menu-icon" data-feather="chevron-down"></i></a>
+                <a href="#overview" class="icon scrolly">Overview<i class="menu-icon" data-feather="chevron-down"></i></a>
                 <ul>
-                    <li><a href="#">Option One</a></li>
-                    <li><a href="#">Option Two</a></li>
-                    <li><a href="#">Option Three</a></li>
-                    <li>
-                        <a href="#">Submenu</a>
-                        <ul>
-                            <li><a href="#">Option One</a></li>
-                            <li><a href="#">Option Two</a></li>
-                            <li><a href="#">Option Three</a></li>
-                            <li><a href="#">Option Four</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#">How On Earth</a></li>
+                    <li><a href="#">PGI</a></li>
                 </ul>
             </li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="#locate" class="scrolly">Locate</a></li>
+            <li><a href="#helpout" class="scrolly">Get Involved</a></li>
+            <li><a href="#contact" class="scrolly">Contact</a></li>
         </ul>
     </nav>
 </header>
-<section id="banner">
-    <div class="content">
-        <h1>{{ config.title }}</h1>
-        <p>{{ config.description }}</p>
-    </div>
-    <a href="#first" class="more scrolly">Learn More</a>
-</section>
-

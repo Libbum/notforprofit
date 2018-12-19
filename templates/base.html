@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        {% include "head.html" %}
+    </head>
+    <body class="is-preload">
+        <div id="wrapper">
+            {% block head %}
+            <header id="header" class="alt">
+            {% endblock head %}
+                <div class="logo">
+                    <a href="{{ config.base_url }}"><strong>Not For Profit</strong>.Earth</a>
+                </div>
+                <nav id="nav">
+                    <ul>
+                        <li class="current"><a href="{{ config.base_url }}">Home</a></li>
+                        <li>
+                            <a href="#overview" class="icon scrolly">Overview<i class="menu-icon" data-feather="chevron-down"></i></a>
+                            <ul>
+                                <li><a href="/howonearth">How On Earth</a></li>
+                                <li><a href="/pgi">PGI</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#locate" class="scrolly">Locate</a></li>
+                        <li><a href="#helpout" class="scrolly">Get Involved</a></li>
+                        <li><a href="#contact" class="scrolly">Contact</a></li>
+                    </ul>
+                </nav>
+            </header>
+
+            {% block content %}{% endblock content %}
+
+            {% include "footer.html" %}
+        </div>
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/jquery.dropotron.min.js"></script>
+        <script src="/js/jquery.scrollex.min.js"></script>
+        <script src="/js/jquery.scrolly.min.js"></script>
+        <script src="/js/browser.min.js"></script>
+        <script src="/js/breakpoints.min.js"></script>
+        <script src="/js/util.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+        <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+        <script src="/js/main.js"></script>
+    </body>
+</html>

@@ -1,50 +1,53 @@
-<!DOCTYPE HTML>
-<html>
-    <head>
-        {% include "head.html" %}
-    </head>
-    <body class="is-preload">
-        <div id="wrapper">
-            {% include "header.html" %}
-            <section class="main alt" id="first">
+{% extends "base.html" %}
+
+{% block content %}
+<section id="banner">
+    <div class="content">
+        <h1>{{ config.title }}</h1>
+        <p>{{ config.description }}</p>
+    </div>
+    <a href="#overview" class="more scrolly">Learn More</a>
+</section>
+
+            <section class="main alt" id="overview">
                 <header>
-                    <h2>Fusce sed adipiscing</h2>
-                    <p>Aenean ornare velit lacus varius enim ullamcorper proin aliquam facilisis ante sed etiam magna interdum congue. Sed consequat amet dolor magna consequat. Lorem ipsum dolor amet nullam sed etiam veroeros.</p>
+                    <h2>What exactly is a Not For Profit?</h2>
+                    <p>A few paragraphs of introduction, motivation for this page <i>etc.</i> Probably not the greatest to plug things here, but I guess your book and PGI are closely related to what we want here; so they're good placeholders.</p>
                 </header>
                 <div class="inner">
                     <article class="post style2">
                         <div class="content">
                             <header>
-                                <span class="category">Erat lacinia</span>
-                                <h3>Nisl euismod</h3>
+                                <span class="category">What's the plan?</span>
+                                <h3>How on Earth</h3>
                             </header>
-                            <p>Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec sed lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam magna tempus.</p>
+                            <p>There is a way our economy can work for everyone. It involves profits circulating continuously through our economic system, rather than accumulating at the top.</p>
                             <ul class="actions">
-                                <li><a href="#" class="button">Learn More <i data-feather="chevron-right"></i></a></li>
+                                <li><a href="/howonearth" class="button">Read More <i data-feather="chevron-right"></i></a></li>
                             </ul>
                         </div>
-                        <div class="image" data-position="center"><img src="/images/pic05.jpg" alt="" /></div>
+                        <div class="image" data-position="center"><img src="/images/howonearth.png" alt="" /></div>
                     </article>
                     <article class="post style2 alt">
                         <div class="content">
                             <header>
-                                <span class="category">Magna sed</span>
-                                <h3>Integer nulla</h3>
+                                <span class="category">Rethinking Economy</span>
+                                <h3>Post Growth?</h3>
                             </header>
-                            <p>Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec sed lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam magna tempus.</p>
+                            <p>We need an economy that naturally circulates money rather than concentrating it, an economy that puts people's needs ahead of corporate greed, an economy that gives more than it takes from our life-supporting environment.</p>
                             <ul class="actions">
-                                <li><a href="#" class="button">Learn More <i data-feather="chevron-right"></i></a></li>
+                                <li><a href="/pgi" class="button">Learn More <i data-feather="chevron-right"></i></a></li>
                             </ul>
                         </div>
-                        <div class="image" data-position="center"><img src="/images/pic06.jpg" alt="" /></div>
+                        <div class="image" data-position="center"><img src="/images/postgrowth.png" alt="" /></div>
                     </article>
                 </div>
             </section>
 
-            <section class="main">
+            <section class="main" id="locate">
                 <header>
                     <h2>Find Not For Profit Entities in Your Area</h2>
-                    <p>Businesses of interest to you are listed on the map below.</p>
+                    <p>Businesses of interest to you are listed on the map below. We can easily add filters, search and additional information here.</p>
                 </header>
                 <div class="inner">
                     <div id="map"></div>
@@ -55,58 +58,58 @@
                 </div>
             </section>
 
-            <section class="main accent2">
+            <section class="main accent2" id="helpout">
                 <header>
-                    <h2>Egestas phasellus</h2>
-                    <p>Aenean ornare velit lacus varius enim ullamcorper proin aliquam facilisis ante sed etiam magna interdum congue. Sed consequat amet dolor magna consequat. Lorem ipsum dolor amet nullam sed etiam veroeros.</p>
+                    <h2>How can you contribute?</h2>
+                    <p>Some information to the reader on what they can personally do.</p>
                 </header>
                 <div class="inner">
                     <article class="post alt">
                         <div class="content">
                             <header>
-                                <span class="category">Lorem ipsum</span>
-                                <h3>Finibus et magna</h3>
+                                <span class="category">Are you a not for profit?</span>
+                                <h3>Add your details to the database</h3>
                             </header>
-                            <p>Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec sed lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam magna tempus. Lorem ipsum sit tempus amet feugiat.</p>
+                            <p>Include your business in the not for profit database so that others may find you.</p>
                             <ul class="actions">
-                                <li><a href="#" class="button">Learn More <i data-feather="chevron-right"></i></a></li>
+                                <li><a href="#" class="button">Submit <i data-feather="chevron-right"></i></a></li>
                             </ul>
                         </div>
-                        <div class="image" data-position="center"><img src="/images/pic07.jpg" alt="" /></div>
+                        <div class="image" data-position="center"><img src="/images/business.png" alt="" /></div>
                     </article>
                     <article class="post">
                         <div class="content">
                             <header>
-                                <span class="category">Sed etiam</span>
-                                <h3>Nam adipiscing</h3>
+                                <span class="category">Are you an individual?</span>
+                                <h3>Support the transition</h3>
                             </header>
-                            <p>Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec sed lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam magna tempus. Lorem ipsum sit tempus amet feugiat.</p>
+                            <p>Under the current system, non profit businesses may not be the cheapest or most convenient, but there are good reasons this should not persuade you.</p>
                             <ul class="actions">
                                 <li><a href="#" class="button">Learn More <i data-feather="chevron-right"></i></a></li>
                             </ul>
                         </div>
-                        <div class="image" data-position="center"><img src="/images/pic08.jpg" alt="" /></div>
+                        <div class="image" data-position="center"><img src="/images/individual.png" alt="" /></div>
                     </article>
                     <article class="post alt">
                         <div class="content">
                             <header>
-                                <span class="category">Sapien erat</span>
-                                <h3>Amet sed nullam</h3>
+                                <span class="category">Are you a researcher or policy maker?</span>
+                                <h3>Help invent the future</h3>
                             </header>
-                            <p>Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec sed lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam magna tempus. Lorem ipsum sit tempus amet feugiat.</p>
+                            <p>We need people like you to shape policy, society and the economy.</p>
                             <ul class="actions">
                                 <li><a href="#" class="button">Learn More <i data-feather="chevron-right"></i></a></li>
                             </ul>
                         </div>
-                        <div class="image" data-position="center"><img src="/images/pic09.jpg" alt="" /></div>
+                        <div class="image" data-position="center"><img src="/images/research.png" alt="" /></div>
                     </article>
                 </div>
             </section>
 
-            <section class="main alt special">
+            <section class="main alt special" id="contact">
                 <header>
                     <h2>Get in touch</h2>
-                    <p>Aenean ornare velit lacus varius enim ullamcorper proin aliquam facilisis ante sed etiam magna interdum congue. Sed consequat amet dolor magna consequat. Lorem ipsum dolor amet nullam sed etiam veroeros.</p>
+                    <p>Is there anything else you'd like to know, or wish was included in this database? Let us know!</p>
                 </header>
                 <div class="inner narrow">
                     <form action="#" method="post">
@@ -127,20 +130,4 @@
                     </form>
                 </div>
             </section>
-
-            {% include "footer.html" %}
-
-        </div>
-
-        <script src="/js/jquery.min.js"></script>
-        <script src="/js/jquery.dropotron.min.js"></script>
-        <script src="/js/jquery.scrollex.min.js"></script>
-        <script src="/js/jquery.scrolly.min.js"></script>
-        <script src="/js/browser.min.js"></script>
-        <script src="/js/breakpoints.min.js"></script>
-        <script src="/js/util.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-        <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
-        <script src="/js/main.js"></script>
-    </body>
-</html>
+{% endblock content %}
