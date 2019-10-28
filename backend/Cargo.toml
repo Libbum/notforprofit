@@ -1,0 +1,16 @@
+[package]
+name = "not_for_profit"
+version = "0.1.0"
+authors = ["Tim DuBois <tim@neophilus.net>"]
+edition = "2018"
+
+[dependencies]
+actix-web = "1.0"
+diesel = { version = "1.4", features = ["postgres"] }
+dotenv = "0.15"
+env_logger = "0.7"
+futures = "0.1"
+juniper = "0.14"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
