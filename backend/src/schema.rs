@@ -26,7 +26,7 @@ table! {
         url -> Nullable<Text>,
         publisher_id -> Int4,
         for_profit -> Bool,
-        open_access_fee -> Nullable<Int8>,
+        open_access_fee -> Nullable<Int4>,
         open_access_currency -> Nullable<Varchar>,
         open_access_details -> Nullable<Varchar>,
         ownership_details -> Nullable<Text>,

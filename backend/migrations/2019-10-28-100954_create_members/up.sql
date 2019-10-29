@@ -11,7 +11,7 @@ CREATE TABLE journals (
     publisher_id INT NOT NULL,
     -- Owner is M2M
     for_profit BOOLEAN NOT NULL,
-    open_access_fee BIGINT CHECK (open_access_fee >= 0), --TODO: Proper currency conversion.
+    open_access_fee INT CHECK (open_access_fee >= 0), --TODO: Proper currency conversion. We probably want this to be BIGINT, but juniper doesn't convert it...
     open_access_currency VARCHAR CHECK (length(open_access_currency) = 3),
     open_access_details VARCHAR, -- TODO: This may be better as a bool for Radical OA y/n.
     ownership_details TEXT, --TODO: This is not the best. Might be better to merge details of owners, and put this information in their tables.
@@ -56,7 +56,7 @@ CREATE TABLE journal_categories (
     PRIMARY KEY (journal_id, category_id)
 );
 
-INSERT INTO publishers(name) VALUES ('IOP Science');
+INSERT INTO publishers(name) VALUES ('IOP Publishing');
 INSERT INTO owners(name) VALUES ('Institute of Physics');
 INSERT INTO owners(name) VALUES ('Deutsche Physikalische Gesellschaft');
 INSERT INTO categories(focus) VALUES ('Physics');

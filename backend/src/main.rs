@@ -1,4 +1,4 @@
-#[macro_use] 
+#[macro_use]
 extern crate diesel;
 extern crate juniper;
 
@@ -24,23 +24,23 @@ fn main() -> io::Result<()> {
             .service(web::resource("/graphiql").route(web::get().to(graphiql)))
     })
     .bind("localhost:8080")?
-        .run()
+    .run()
 }
 
 fn graphql(
     st: web::Data<Arc<Schema>>,
     data: web::Json<GraphQLRequest>,
-    ) -> impl Future<Item = HttpResponse, Error = Error> {
+) -> impl Future<Item = HttpResponse, Error = Error> {
     web::block(move || {
         let res = data.execute(&st, &());
         Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
     })
     .map_err(Error::from)
-        .and_then(|user| {
-            Ok(HttpResponse::Ok()
-               .content_type("application/json")
-               .body(user))
-        })
+    .and_then(|user| {
+        Ok(HttpResponse::Ok()
+            .content_type("application/json")
+            .body(user))
+    })
 }
 
 fn graphiql() -> HttpResponse {
