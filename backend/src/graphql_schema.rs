@@ -15,12 +15,47 @@ pub struct Publisher {
     #[allow(unused)]
     id: i32,
     name: String,
+    url: Option<String>,
+    comments: Option<String>,
 }
 
 #[juniper::object(description = "A Journal Publication House")]
 impl Publisher {
     pub fn name(&self) -> &str {
         self.name.as_str()
+    }
+
+    pub fn url(&self) -> Option<Url> {
+        match &self.url {
+            Some(s) => Url::parse(&s).ok(),
+            None => None,
+        }
+    }
+
+    pub fn comments(&self) -> &Option<String> {
+        &self.comments
+    }
+}
+
+#[derive(Queryable)]
+pub struct Owner {
+    #[allow(unused)]
+    id: i32,
+    name: String,
+    url: Option<String>,
+}
+
+#[juniper::object(description = "An Owner of a Journal or Publication House")]
+impl Owner {
+    pub fn name(&self) -> &str {
+        self.name.as_str()
+    }
+
+    pub fn url(&self) -> Option<Url> {
+        match &self.url {
+            Some(s) => Url::parse(&s).ok(),
+            None => None,
+        }
     }
 }
 
@@ -32,10 +67,8 @@ pub struct Journal {
     url: Option<String>,
     publisher_id: i32,
     for_profit: bool,
-    open_access_fee: Option<i32>, //TODO: Need to check what graphql needs for conversions here.
-    open_access_currency: Option<String>, //TODO: Some form of char(3). We should check this in the impl.
-    open_access_details: Option<String>,  //TODO: Maybe better as a bool for Radical OA? y/n
-    ownership_details: Option<String>,    //TODO: Maybe merge with owners.
+    radical_open_access: Option<bool>,
+    comments: Option<String>,
                                           //TODO: institutional agreements
 }
 
@@ -61,24 +94,105 @@ impl Journal {
             .expect("Error locating publisher")
     }
 
+    pub fn owners(&self) -> Vec<Owner> {
+        use crate::schema::owners::dsl::*;
+        use crate::schema::journal_owners::dsl::*;
+        let connection = establish_connection();
+        journal_owners
+            .inner_join(owners)
+            .filter(journal_id.eq(self.id))
+            .select((id, name, url))
+            .load::<Owner>(&connection)
+            .expect("Error locating ownership information")
+    }
+
+    pub fn ownership_url(&self) -> Vec<String> {
+        use crate::schema::owners::dsl::*;
+        use crate::schema::journal_owners::dsl::*;
+        let connection = establish_connection();
+        let urls: Vec<String> = journal_owners
+            .inner_join(owners)
+            .filter(journal_id.eq(self.id))
+            .select(ownership_url)
+            .load(&connection)
+            .expect("Error locating ownership information");
+        urls //TODO: Parse these to URL types.
+    }
+
     pub fn for_profit(&self) -> bool {
         self.for_profit
     }
 
-    pub fn open_access_fee(&self) -> Option<i32> {
-        self.open_access_fee
+    pub fn open_access_fees(&self) -> Vec<OpenAccessFee> {
+        use crate::schema::open_access_fees::dsl::*;
+        let connection = establish_connection();
+        open_access_fees
+            .filter(journal_id.eq(self.id))
+            .load::<OpenAccessFee>(&connection)
+            .expect("Error locating OA Fee data")
     }
 
-    pub fn open_access_currency(&self) -> &Option<String> {
-        &self.open_access_currency //TODO: Length check? Maybe not needed since it's constrained at the DB level.
+    pub fn radical_open_access(&self) -> &Option<bool> {
+        &self.radical_open_access
     }
 
-    pub fn open_access_details(&self) -> &Option<String> {
-        &self.open_access_details
+    pub fn categories(&self) -> Vec<String> {
+        use crate::schema::categories::dsl::*;
+        use crate::schema::journal_categories::dsl::*;
+        let connection = establish_connection();
+        journal_categories
+            .inner_join(categories)
+            .filter(journal_id.eq(self.id))
+            .select(focus)
+            .load::<String>(&connection)
+            .expect("Error locating OA Fee data")
     }
 
-    pub fn ownership_details(&self) -> &Option<String> {
-        &self.ownership_details
+    pub fn comments(&self) -> &Option<String> {
+        &self.comments
+    }
+}
+
+#[derive(Queryable)]
+pub struct OpenAccessFee {
+    #[allow(unused)]
+    id: i32,
+    journal_id: i32,
+    fee: i32,
+    currency: String,
+}
+
+#[juniper::object(description = "OA Fees for a Journal in various currencies")]
+impl OpenAccessFee {
+    pub fn journal(&self) -> Journal {
+        use crate::schema::journals::dsl::*;
+        let connection = establish_connection();
+        journals
+            .filter(id.eq(self.journal_id))
+            .first::<Journal>(&connection)
+            .expect("Error locating journal")
+    }
+
+    pub fn fee(&self) -> i32 {
+        self.fee
+    }
+
+    pub fn currency(&self) -> &str {
+        self.currency.as_str()
+    }
+}
+
+#[derive(Queryable)]
+pub struct Category {
+    #[allow(unused)]
+    id: i32,
+    focus: String,
+}
+
+#[juniper::object(description = "Category of interest")]
+impl Category {
+    pub fn focus(&self) -> &str {
+        self.focus.as_str()
     }
 }
 
@@ -101,6 +215,14 @@ impl QueryRoot {
             .load::<Publisher>(&connection)
             .expect("Error loading publishers")
     }
+    fn owners() -> Vec<Owner> {
+        use crate::schema::owners::dsl::*;
+        let connection = establish_connection();
+        owners
+            .limit(100)
+            .load::<Owner>(&connection)
+            .expect("Error loading owners")
+    }
     fn journals() -> Vec<Journal> {
         use crate::schema::journals::dsl::*;
         let connection = establish_connection();
@@ -108,6 +230,22 @@ impl QueryRoot {
             .limit(100)
             .load::<Journal>(&connection)
             .expect("Error loading journals")
+    }
+    fn open_access_fees() -> Vec<OpenAccessFee> {
+        use crate::schema::open_access_fees::dsl::*;
+        let connection = establish_connection();
+        open_access_fees
+            .limit(100)
+            .load::<OpenAccessFee>(&connection)
+            .expect("Error loading OA Fees")
+    }
+    fn categories() -> Vec<Category> {
+        use crate::schema::categories::dsl::*;
+        let connection = establish_connection();
+        categories
+            .limit(100)
+            .load::<Category>(&connection)
+            .expect("Error loading categories")
     }
 }
 
@@ -128,6 +266,8 @@ impl MutationRoot {
 #[table_name = "publishers"]
 pub struct NewPublisher {
     pub name: String,
+    pub url: Option<String>,
+    pub comments: Option<String>,
 }
 
 pub type Schema = RootNode<'static, QueryRoot, MutationRoot>;
