@@ -90,22 +90,39 @@ CREATE TABLE journal_categories (
     PRIMARY KEY (journal_id, category_id)
 );
 
-/*CREATE OR REPLACE FUNCTION radical_oa_check() RETURNS trigger AS $radical_oa_check$
+CREATE FUNCTION publication_model_check() RETURNS trigger AS $publication_model_check$
+    DECLARE
+        publication_model INT;
     BEGIN
-        -- Check that the journal has a radical open access value.
-        -- If it doesn't, and we have a sum of 0 for fees, assume radical OA
-        IF ( ( SELECT SUM(fee) FROM open_access_fees WHERE journal_id = NEW.journal_id ) = 0 )
-           AND
-           ( ( SELECT radical_open_access FROM journals WHERE id = NEW.journal_id ) = NULL ) THEN
-            UPDATE journals SET radical_open_access = True WHERE id = NEW.journal_id;
-        END IF;
+        SELECT INTO publication_model publication_model_id
+            FROM journals
+            WHERE id = NEW.journal_id;
+        CASE publication_model
+             WHEN 4 THEN
+                 --Green
+                 IF NEW.category_id = 2 THEN
+                     RAISE EXCEPTION 'Green Open Access publications require APC, not Publication fees.';
+                 END IF;
+             WHEN 5 THEN
+                 --Gold
+                 IF NEW.category_id <> 1 THEN
+                     RAISE EXCEPTION 'Gold Open Access publications only require APC fees.';
+                 END IF;
+             WHEN 6 THEN
+                 --Platinum
+                 RAISE EXCEPTION 'Platinum Open Access publications do not require fees.';
+             ELSE
+                 IF NEW.category_id = 1 THEN
+                     RAISE EXCEPTION 'This form of publication cannot have APS fees.';
+                 END IF;
+        END CASE;
 
         RETURN NEW;
     END;
-$radical_oa_check$ LANGUAGE plpgsql;
+$publication_model_check$ LANGUAGE plpgsql;
 
-CREATE TRIGGER radical_oa_check AFTER INSERT OR UPDATE OR DELETE ON open_access_fees
-    FOR EACH ROW EXECUTE PROCEDURE radical_oa_check();*/
+CREATE TRIGGER publication_model_check BEFORE INSERT OR UPDATE ON fees
+    FOR EACH ROW EXECUTE PROCEDURE publication_model_check();
 
 --TODO: These are the most popular, but we should put the entire list in probably.
 -- ISO 4217

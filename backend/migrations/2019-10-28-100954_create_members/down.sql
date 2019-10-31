@@ -2,6 +2,7 @@ DROP TABLE if exists journals cascade;
 DROP TABLE if exists publishers cascade;
 DROP TABLE if exists owners cascade;
 DROP TABLE if exists categories cascade;
+DROP TRIGGER publication_model_check ON fees;
 DROP TABLE if exists fees cascade;
 DROP TABLE if exists fee_categories cascade;
 DROP TABLE publication_models;
