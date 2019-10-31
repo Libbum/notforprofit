@@ -67,7 +67,7 @@ pub struct Journal {
     url: Option<String>,
     publisher_id: i32,
     for_profit: bool,
-    radical_open_access: Option<bool>,
+    publication_model_id: i32,
     comments: Option<String>,
                                           //TODO: institutional agreements
 }
@@ -123,17 +123,23 @@ impl Journal {
         self.for_profit
     }
 
-    pub fn open_access_fees(&self) -> Vec<OpenAccessFee> {
-        use crate::schema::open_access_fees::dsl::*;
+    pub fn fees(&self) -> Vec<Fee> {
+        use crate::schema::fees::dsl::*;
         let connection = establish_connection();
-        open_access_fees
+        fees
             .filter(journal_id.eq(self.id))
-            .load::<OpenAccessFee>(&connection)
-            .expect("Error locating OA Fee data")
+            .load::<Fee>(&connection)
+            .expect("Error locating Fee data")
     }
 
-    pub fn radical_open_access(&self) -> &Option<bool> {
-        &self.radical_open_access
+    pub fn publication_model(&self) -> String {
+        use crate::schema::publication_models::dsl::*;
+        let connection = establish_connection();
+        publication_models
+            .filter(id.eq(&self.publication_model_id))
+            .select(model)
+            .first::<String>(&connection) //TODO: Enum
+            .expect("Error locating Fee data")
     }
 
     pub fn categories(&self) -> Vec<String> {
@@ -145,7 +151,7 @@ impl Journal {
             .filter(journal_id.eq(self.id))
             .select(focus)
             .load::<String>(&connection)
-            .expect("Error locating OA Fee data")
+            .expect("Error locating Category data")
     }
 
     pub fn comments(&self) -> &Option<String> {
@@ -154,16 +160,17 @@ impl Journal {
 }
 
 #[derive(Queryable)]
-pub struct OpenAccessFee {
+pub struct Fee {
     #[allow(unused)]
     id: i32,
     journal_id: i32,
     fee: i32,
-    currency: String,
+    currency_code: String,
+    category_id: i32,
 }
 
-#[juniper::object(description = "OA Fees for a Journal in various currencies")]
-impl OpenAccessFee {
+#[juniper::object(description = "Journal fees for various access modes in published currencies")]
+impl Fee {
     pub fn journal(&self) -> Journal {
         use crate::schema::journals::dsl::*;
         let connection = establish_connection();
@@ -177,8 +184,45 @@ impl OpenAccessFee {
         self.fee
     }
 
-    pub fn currency(&self) -> &str {
-        self.currency.as_str()
+    pub fn currency(&self) -> Currency {
+        use crate::schema::currencies::dsl::*;
+        let connection = establish_connection();
+        currencies
+            .filter(code.eq(&self.currency_code))
+            .first::<Currency>(&connection)
+            .expect("Error locating currency details")
+    }
+
+    pub fn category(&self) -> String {
+        use crate::schema::fee_categories::dsl::*;
+        let connection = establish_connection();
+        fee_categories
+            .filter(id.eq(self.category_id))
+            .select(category)
+            .first::<String>(&connection) //TODO: Enum
+            .expect("Error locating fee category")
+    }
+}
+
+#[derive(Queryable)]
+pub struct Currency {
+    code: String,
+    symbol: String,
+    name: String,
+}
+
+#[juniper::object(description = "Details of Currency being used")]
+impl Currency {
+    pub fn code(&self) -> &str {
+        self.code.as_str()
+    }
+
+    pub fn symbol(&self) -> &str {
+        self.symbol.as_str()
+    }
+
+    pub fn name(&self) -> &str {
+        self.name.as_str()
     }
 }
 
@@ -231,12 +275,12 @@ impl QueryRoot {
             .load::<Journal>(&connection)
             .expect("Error loading journals")
     }
-    fn open_access_fees() -> Vec<OpenAccessFee> {
-        use crate::schema::open_access_fees::dsl::*;
+    fn fees() -> Vec<Fee> {
+        use crate::schema::fees::dsl::*;
         let connection = establish_connection();
-        open_access_fees
+        fees
             .limit(100)
-            .load::<OpenAccessFee>(&connection)
+            .load::<Fee>(&connection)
             .expect("Error loading OA Fees")
     }
     fn categories() -> Vec<Category> {

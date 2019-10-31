@@ -5,6 +5,12 @@ CREATE TABLE publishers (
     comments TEXT
 );
 
+--TODO: Read only access to users
+CREATE TABLE publication_models (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    model VARCHAR NOT NULL
+);
+
 CREATE TABLE journals (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR NOT NULL,
@@ -13,21 +19,38 @@ CREATE TABLE journals (
     -- Owner is M2M
     for_profit BOOLEAN NOT NULL,
     -- Fees are M2M
-    radical_open_access BOOLEAN,
+    publication_model_id INT NOT NULL,
     -- TODO institutional agreements.
     -- Think a M2M system would be better than just SU, which is done atm.
     -- Agreements need to cover at least y/n/?/na/discout(value), and perhaps more.
     -- Category is M2M
     comments TEXT,
-    FOREIGN KEY (publisher_id) REFERENCES publishers(id)
+    FOREIGN KEY (publisher_id) REFERENCES publishers(id),
+    FOREIGN KEY (publication_model_id) REFERENCES publication_models(id)
 );
 
-CREATE TABLE open_access_fees (
+--TODO: Read only access to users
+CREATE TABLE currencies (
+    code VARCHAR UNIQUE NOT NULL PRIMARY KEY CHECK (length(code) = 3),
+    symbol VARCHAR NOT NULL,
+    name VARCHAR NOT NULL
+);
+
+--TODO: Read only access to users
+CREATE TABLE fee_categories (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    category VARCHAR NOT NULL
+);
+
+CREATE TABLE fees (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     journal_id INT NOT NULL,
     fee INT NOT NULL CHECK (fee >= 0),
-    currency VARCHAR NOT NULL CHECK (length(currency) = 3),
-    FOREIGN KEY (journal_id) REFERENCES journals(id)
+    currency_code VARCHAR NOT NULL CHECK (length(currency_code) = 3),
+    category_id INT NOT NULL,
+    FOREIGN KEY (journal_id) REFERENCES journals(id),
+    FOREIGN KEY (currency_code) REFERENCES currencies(code),
+    FOREIGN KEY (category_id) REFERENCES fee_categories(id)
 );
 
 CREATE TABLE owners (
@@ -55,7 +78,7 @@ CREATE TABLE journal_owners (
 );
 
 CREATE TABLE categories (
-    id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     focus VARCHAR NOT NULL
 );
 
@@ -67,7 +90,7 @@ CREATE TABLE journal_categories (
     PRIMARY KEY (journal_id, category_id)
 );
 
-CREATE OR REPLACE FUNCTION radical_oa_check() RETURNS trigger AS $radical_oa_check$
+/*CREATE OR REPLACE FUNCTION radical_oa_check() RETURNS trigger AS $radical_oa_check$
     BEGIN
         -- Check that the journal has a radical open access value.
         -- If it doesn't, and we have a sum of 0 for fees, assume radical OA
@@ -82,13 +105,44 @@ CREATE OR REPLACE FUNCTION radical_oa_check() RETURNS trigger AS $radical_oa_che
 $radical_oa_check$ LANGUAGE plpgsql;
 
 CREATE TRIGGER radical_oa_check AFTER INSERT OR UPDATE OR DELETE ON open_access_fees
-    FOR EACH ROW EXECUTE PROCEDURE radical_oa_check();
+    FOR EACH ROW EXECUTE PROCEDURE radical_oa_check();*/
+
+--TODO: These are the most popular, but we should put the entire list in probably.
+-- ISO 4217
+INSERT INTO currencies(code, symbol, name) VALUES ('USD', '$', 'US Dollar'),
+                                                  ('EUR', '€', 'Euro'),
+                                                  ('GBP', '£', 'British Pound'),
+                                                  ('SEK', 'kr', 'Swedish Krona'),
+                                                  ('INR', '₹', 'Indian Rupee'),
+                                                  ('AUD', '$', 'Australian Dollar'),
+                                                  ('CAD', '$', 'Canadian Dollar'),
+                                                  ('SGD', '$', 'Singapore Dollar'),
+                                                  ('CHF', 'CHF', 'Swiss Franc'),
+                                                  ('MYR', 'RM', 'Malaysian Ringgit'),
+                                                  ('JPY', '¥', 'Japanese Yen'),
+                                                  ('NZD', '$', 'New Zealand Dollar'),
+                                                  ('MXN', '$', 'Mexican Peso'),
+                                                  ('CNY', '¥', 'Chinese Yuan Renminbi');
+
+INSERT INTO fee_categories(category) VALUES ('ArticleProcessingCharge'), --Explicitly for OA
+                                            ('Publication'), --Charges for publication, generally in closed models e.g. https://www.pnas.org/page/authors/fees
+                                            ('Subscription'), --Yearly fee for access
+                                            ('PayPerView'); --Single paper access
+
+
+INSERT INTO publication_models(model) VALUES ('Subscription'), --Closed, not OA
+                                             ('BronzeOpenAccess'), --Delayed OA, Closed for a period of time, then released as OA in some form
+                                             ('HybridOpenAccess'), --'Open Choice' puts burden on authors to pay for open access, otherwise closed
+                                             ('GreenOpenAccess'), --Allows self-archiving of authors work outside of the journals garden
+                                             ('GoldOpenAccess'), --All content open for free and immediately for viewing. Usually under CC.
+                                             ('PlatinumOpenAcess'); --Same as Gold, but do not charge the authors an APC.
+
 
 INSERT INTO publishers(name, url, comments) VALUES ('IOP Publishing','https://ioppublishing.org/','Publically available Environmental Policy, Modern Day Slavery Policy & Gender Pay Gap statistics for organisation');
 INSERT INTO owners(name, url) VALUES ('Institute of Physics', 'http://www.iop.org/'),
                                      ('Deutsche Physikalische Gesellschaft', 'https://www.dpg-physik.de/');
 INSERT INTO categories(focus) VALUES ('Physics');
-INSERT INTO journals(name, url, publisher_id, for_profit, radical_open_access) VALUES ('New Journal of Physics', 'https://iopscience.iop.org/journal/1367-2630', 1, False, False);
-INSERT INTO open_access_fees(journal_id, fee, currency) VALUES (1, 1400, 'GBP'), (1, 1600, 'EUR'), (1, 2100, 'USD');
+INSERT INTO journals(name, url, publisher_id, for_profit, publication_model_id) VALUES ('New Journal of Physics', 'https://iopscience.iop.org/journal/1367-2630', 1, False, 5);
+INSERT INTO fees(journal_id, fee, currency_code, category_id) VALUES (1, 1400, 'GBP', 1), (1, 1600, 'EUR', 1), (1, 2100, 'USD', 1);
 INSERT INTO journal_owners(journal_id, owner_id, ownership_url) VALUES (1, 1, 'https://beta.iop.org/governance'), (1, 2, 'https://www.dpg-physik.de/ueber-uns');
 INSERT INTO journal_categories(journal_id, category_id) VALUES (1, 1);
