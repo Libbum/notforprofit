@@ -25,9 +25,7 @@ CREATE TABLE journals (
     for_profit BOOLEAN NOT NULL,
     -- Fees are M2M
     publication_model publication_model NOT NULL,
-    -- TODO institutional agreements.
-    -- Think a M2M system would be better than just SU, which is done atm.
-    -- Agreements need to cover at least y/n/?/na/discout(value), and perhaps more.
+    --TODO: license details
     -- Category is M2M
     comments TEXT,
     FOREIGN KEY (publisher_id) REFERENCES publishers(id)
@@ -153,15 +151,51 @@ INSERT INTO currencies(code, symbol, name) VALUES ('USD', '$', 'US Dollar'),
                                                   ('MXN', '$', 'Mexican Peso'),
                                                   ('CNY', '¥', 'Chinese Yuan Renminbi');
 
+-- Categories
+INSERT INTO categories(focus) VALUES ('Physics'),
+                                     ('Sustainable Economy'),
+                                     ('Sustainability'),
+                                     ('Not-for-Profit'),
+                                     ('Organizational Theory'),
+                                     ('Economics'),
+                                     ('International Studies'),
+                                     ('Environmental Science'),
+                                     ('Science'),
+                                     ('Technology'),
+                                     ('Society'),
+                                     ('Culture'),
+                                     ('Interdisciplinary Communications');
 
-INSERT INTO institutions(name, url) VALUES ('Stockholm University', 'https://www.su.se/');
-INSERT INTO publishers(name, url, comments) VALUES ('IOP Publishing','https://ioppublishing.org/','Publically available Environmental Policy, Modern Day Slavery Policy & Gender Pay Gap statistics for organisation');
-INSERT INTO owners(name, url) VALUES ('Institute of Physics', 'http://www.iop.org/'),
-                                     ('Deutsche Physikalische Gesellschaft', 'https://www.dpg-physik.de/');
-INSERT INTO categories(focus) VALUES ('Physics');
+-- Publishers
+INSERT INTO publishers(name, url, comments) VALUES ('IOP Publishing','https://ioppublishing.org/','Publically available Environmental Policy, Modern Day Slavery Policy & Gender Pay Gap statistics for organisation'),
+                                                   ('USC Annenberg Press', 'https://annenbergpress.com/', 'University of Southern California');
+INSERT INTO publishers(name, url) VALUES ('Taylor and Francis', 'https://taylorandfrancis.com/'),
+                                         ('Elsevier', 'https://www.elsevier.com/'),
+                                         ('Resilience Alliance', 'https://www.resalliance.org/'),
+                                         ('White Horse Press', 'http://www.whp-journals.co.uk/'),
+                                         ('Cambridge University Press', 'https://www.cambridge.org/'),
+                                         ('Springer', 'https://www.springer.com/'),
+                                         ('International Centre for Not-for-Profit Law', 'http://www.icnl.org/'),
+                                         ('Oxford University Press', 'https://global.oup.com/'),
+                                         ('University of Arizona Press', 'https://uapress.arizona.edu/'),
+                                         ('Sage', 'https://www.sagepub.com/'),
+                                         ('World Economics Association', 'https://www.worldeconomicsassociation.org/'),
+                                         ('MDPI', 'https://www.mdpi.com/'),
+                                         ('Wiley Online', 'https://onlinelibrary.wiley.com/'),
+                                         ('The Society for Social Studies of Science', 'https://www.4sonline.org/');
+
+-- Journals
 INSERT INTO journals(name, url, publisher_id, for_profit, publication_model) VALUES ('New Journal of Physics', 'https://iopscience.iop.org/journal/1367-2630', 1, False, 'gold_open_access');
 INSERT INTO fees(journal_id, fee, currency_code, category) VALUES (1, 1400, 'GBP', 'article_processing_charge'), (1, 1600, 'EUR', 'article_processing_charge'), (1, 2100, 'USD', 'article_processing_charge');
+INSERT INTO journal_categories(journal_id, category_id) VALUES (1, 1);
+
+-- Institutions
+INSERT INTO institutions(name, url) VALUES ('Stockholm University', 'https://www.su.se/');
+INSERT INTO institutional_agreements(institution_id, journal_id, agreement, url) VALUES (1, 1, 'yes', 'https://www.su.se/english/library/publish/publish-open-access/iop-institute-of-physics-1.398957');
+
+-- Owners
+INSERT INTO owners(name, url) VALUES ('Institute of Physics', 'http://www.iop.org/'),
+                                     ('Deutsche Physikalische Gesellschaft', 'https://www.dpg-physik.de/');
 INSERT INTO journal_owners(journal_id, owner_id, ownership_url) VALUES (1, 1, 'https://beta.iop.org/governance'), (1, 2, 'https://www.dpg-physik.de/ueber-uns');
 INSERT INTO publisher_owners(publisher_id, owner_id, ownership_url) VALUES (1, 1, 'https://ioppublishing.org/about-us/');
-INSERT INTO journal_categories(journal_id, category_id) VALUES (1, 1);
-INSERT INTO institutional_agreements(institution_id, journal_id, agreement, url) VALUES (1, 1, 'yes', 'https://www.su.se/english/library/publish/publish-open-access/iop-institute-of-physics-1.398957');
+
