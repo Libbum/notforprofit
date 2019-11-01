@@ -13,5 +13,4 @@ DROP TABLE institutional_agreements cascade;
 DROP TABLE institutions cascade;
 DROP TABLE currencies;
 DROP TABLE journal_categories;
-DROP TABLE journal_owners;
 DROP TABLE publisher_owners;

@@ -51,26 +51,17 @@ CREATE TABLE fees (
 CREATE TABLE owners (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR NOT NULL,
-    url TEXT
+    publisher_ownership_url TEXT,
+    comments TEXT --TODO: This is a dumping ground ATM, should work to separate it.
     -- TODO: Useful details on owners. Net worth, company/individual? etc.
 );
 
 CREATE TABLE publisher_owners (
     publisher_id INT NOT NULL,
     owner_id INT NOT NULL,
-    ownership_url TEXT NOT NULL,
     FOREIGN KEY (publisher_id) REFERENCES publishers(id),
     FOREIGN KEY (owner_id) REFERENCES owners(id),
     PRIMARY KEY (publisher_id, owner_id)
-);
-
-CREATE TABLE journal_owners (
-    journal_id INT NOT NULL,
-    owner_id INT NOT NULL,
-    ownership_url TEXT NOT NULL,
-    FOREIGN KEY (journal_id) REFERENCES journals(id),
-    FOREIGN KEY (owner_id) REFERENCES owners(id),
-    PRIMARY KEY (journal_id, owner_id)
 );
 
 CREATE TABLE categories (
@@ -194,8 +185,24 @@ INSERT INTO institutions(name, url) VALUES ('Stockholm University', 'https://www
 INSERT INTO institutional_agreements(institution_id, journal_id, agreement, url) VALUES (1, 1, 'yes', 'https://www.su.se/english/library/publish/publish-open-access/iop-institute-of-physics-1.398957');
 
 -- Owners
-INSERT INTO owners(name, url) VALUES ('Institute of Physics', 'http://www.iop.org/'),
-                                     ('Deutsche Physikalische Gesellschaft', 'https://www.dpg-physik.de/');
-INSERT INTO journal_owners(journal_id, owner_id, ownership_url) VALUES (1, 1, 'https://beta.iop.org/governance'), (1, 2, 'https://www.dpg-physik.de/ueber-uns');
-INSERT INTO publisher_owners(publisher_id, owner_id, ownership_url) VALUES (1, 1, 'https://ioppublishing.org/about-us/');
+INSERT INTO owners(name, publisher_ownership_url) VALUES ('Institute of Physics', 'https://oaspa.org/member/iop-publishing/?highlight=iop'),
+                                     ('The Society for Social Studies of Science', 'https://estsjournal.org/index.php/ests/about/history'),
+                                     ('Resilliance Alliance', 'https://www.guidestar.org/profile/04-3491218'),
+                                     ('Cambridge University', 'https://www.cambridge.org/about-us/annual-report'),
+                                     ('SpringerNature', 'https://group.springernature.com/gp/group/aboutus/our-history'),
+                                     ('ICNL', 'http://www.icnl.org/research/journal/index.html'),
+                                     ('Arizona State University', 'https://journals.uair.arizona.edu/index.php/JPE/about/submissions#authorGuidelines'),
+                                     ('Oxford University', 'https://www.ox.ac.uk/about/organisation/university-as-a-charity?wssl=1'),
+                                     ('World Economics Association', 'http://www.paecon.net/PAEReview/'),
+                                     ('Shu-Kun Lin', 'https://oaspa.org/member/mdpi-ag/');
+INSERT INTO owners(name, publisher_ownership_url, comments) VALUES ('Informa PLC', 'https://informa.com/Documents/Investor%20Relations/2019/20190524%20AGM%20Trading%20Update.pdf', 'Publically Traded'),
+                                     ('RELX', 'https://www.relx.com/investors/share-price/lse', 'Publically Traded'),
+                                     ('Deutsche Physikalische Gesellschaft', 'https://www.dpg-physik.de/ueber-uns/', 'Connected to Institute of Physics as part owner of (at least) the New Journal of Physics'),
+                                     ('White Horse Press LLP', 'https://whitehorsepress.blog/', 'Owned by Sarah, Andrew and Alison Johnson'),
+                                     ('BC Partners', 'https://www.bcpartners.com/private-equity-strategy/portfolio/springer-nature', 'Private equity firm. Main shareholder of SpringerNature'),
+                                     ('Holtzbrinck Publishing Group', 'https://www.holtzbrinck.com', 'Georg von Holtzbrinck, 53% shareholder of SpringerNature'),
+                                     ('Sarah Miller McCune', 'https://uk.sagepub.com/sites/default/files/a1501001_sage_story-50_june2015_final_lo-res.pdf', 'Will be converted into a foundation after she dies (page 57 in "History of Sage" of attached URL'),
+                                     ('John Wiley & Sons, Inc', 'https://www.wiley.com/en-us/investors', 'Publically Traded'),
+                                     ('University of Southern California', 'https://about.usc.edu/files/2019/02/USC-FY18-Financial-Report.pdf', 'See page 15 of report. Not-for-Profit private university');
+INSERT INTO publisher_owners(publisher_id, owner_id) VALUES (1, 1), (1, 13);
 

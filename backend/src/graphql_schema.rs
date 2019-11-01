@@ -32,15 +32,15 @@ impl Publisher {
         }
     }
 
-    pub fn owners(&self) -> Vec<OwnerWithUrl> {
+    pub fn owners(&self) -> Vec<Owner> {
         use crate::schema::owners::dsl::*;
         use crate::schema::publisher_owners::dsl::*;
         let connection = establish_connection();
         publisher_owners
             .inner_join(owners)
             .filter(publisher_id.eq(self.id))
-            .select((name, url, ownership_url))
-            .load::<OwnerWithUrl>(&connection)
+            .select((id, name, publisher_ownership_url, comments))
+            .load::<Owner>(&connection)
             .expect("Error locating ownership information")
     }
 
@@ -51,49 +51,29 @@ impl Publisher {
 
 
 #[derive(Queryable)]
-pub struct OwnerWithUrl {
-    name: String,
-    url: Option<String>,
-    ownership_url: String,
-}
-
-#[juniper::object(description = "Owner of a Journal or Publisher with URL of ownership details")]
-impl OwnerWithUrl {
-    pub fn name(&self) -> &str {
-        self.name.as_str()
-    }
-
-    pub fn url(&self) -> Option<Url> {
-        match &self.url {
-            Some(s) => Url::parse(&s).ok(),
-            None => None,
-        }
-    }
-
-    pub fn ownership_url(&self) -> Option<Url> {
-        Url::parse(&self.ownership_url).ok()
-    }
-}
-
-#[derive(Queryable)]
 pub struct Owner {
     #[allow(unused)]
     id: i32,
     name: String,
-    url: Option<String>,
+    publisher_ownership_url: Option<String>,
+    comments: Option<String>,
 }
 
-#[juniper::object(description = "Owner of a Journal or Publisher")]
+#[juniper::object(description = "Owner of a Publisher")]
 impl Owner {
     pub fn name(&self) -> &str {
         self.name.as_str()
     }
 
-    pub fn url(&self) -> Option<Url> {
-        match &self.url {
+    pub fn publisher_ownership_url(&self) -> Option<Url> {
+        match &self.publisher_ownership_url {
             Some(s) => Url::parse(&s).ok(),
             None => None,
         }
+    }
+
+    pub fn comments(&self) -> &Option<String> {
+        &self.comments
     }
 }
 
@@ -129,18 +109,6 @@ impl Journal {
             .filter(id.eq(self.publisher_id))
             .first::<Publisher>(&connection)
             .expect("Error locating publisher")
-    }
-
-    pub fn owners(&self) -> Vec<OwnerWithUrl> {
-        use crate::schema::owners::dsl::*;
-        use crate::schema::journal_owners::dsl::*;
-        let connection = establish_connection();
-        journal_owners
-            .inner_join(owners)
-            .filter(journal_id.eq(self.id))
-            .select((name, url, ownership_url))
-            .load::<OwnerWithUrl>(&connection)
-            .expect("Error locating ownership information")
     }
 
     pub fn for_profit(&self) -> bool {

@@ -70,17 +70,6 @@ table! {
     use diesel::sql_types::*;
     use crate::enums::*;
 
-    journal_owners (journal_id, owner_id) {
-        journal_id -> Int4,
-        owner_id -> Int4,
-        ownership_url -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::enums::*;
-
     journals (id) {
         id -> Int4,
         name -> Varchar,
@@ -99,7 +88,8 @@ table! {
     owners (id) {
         id -> Int4,
         name -> Varchar,
-        url -> Nullable<Text>,
+        publisher_ownership_url -> Nullable<Text>,
+        comments -> Nullable<Text>,
     }
 }
 
@@ -110,7 +100,6 @@ table! {
     publisher_owners (publisher_id, owner_id) {
         publisher_id -> Int4,
         owner_id -> Int4,
-        ownership_url -> Text,
     }
 }
 
@@ -132,8 +121,6 @@ joinable!(institutional_agreements -> institutions (institution_id));
 joinable!(institutional_agreements -> journals (journal_id));
 joinable!(journal_categories -> categories (category_id));
 joinable!(journal_categories -> journals (journal_id));
-joinable!(journal_owners -> journals (journal_id));
-joinable!(journal_owners -> owners (owner_id));
 joinable!(journals -> publishers (publisher_id));
 joinable!(publisher_owners -> owners (owner_id));
 joinable!(publisher_owners -> publishers (publisher_id));
@@ -145,7 +132,6 @@ allow_tables_to_appear_in_same_query!(
     institutional_agreements,
     institutions,
     journal_categories,
-    journal_owners,
     journals,
     owners,
     publisher_owners,
