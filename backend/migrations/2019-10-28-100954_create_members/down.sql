@@ -1,3 +1,4 @@
+--LANGUAGE plpgsql;
 DROP TRIGGER publication_model_check ON fees;
 DROP FUNCTION publication_model_check;
 DROP TYPE maybe_logic cascade ;
