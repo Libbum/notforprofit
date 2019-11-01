@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate diesel_derive_enum;
 extern crate juniper;
 
 use std::io;
@@ -10,7 +12,9 @@ use futures::future::Future;
 use juniper::http::graphiql::graphiql_source;
 use juniper::http::GraphQLRequest;
 
+mod enums;
 mod graphql_schema;
+#[allow(unused_imports)]
 mod schema;
 
 use crate::graphql_schema::{create_schema, Schema};

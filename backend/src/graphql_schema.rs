@@ -1,5 +1,4 @@
 extern crate dotenv;
-
 use std::env;
 
 use diesel::pg::PgConnection;
@@ -9,6 +8,7 @@ use juniper::RootNode;
 use url::Url;
 
 use crate::schema::publishers;
+use crate::enums::*;
 
 #[derive(Queryable)]
 pub struct Publisher {
@@ -32,8 +32,46 @@ impl Publisher {
         }
     }
 
+    pub fn owners(&self) -> Vec<OwnerWithUrl> {
+        use crate::schema::owners::dsl::*;
+        use crate::schema::publisher_owners::dsl::*;
+        let connection = establish_connection();
+        publisher_owners
+            .inner_join(owners)
+            .filter(publisher_id.eq(self.id))
+            .select((name, url, ownership_url))
+            .load::<OwnerWithUrl>(&connection)
+            .expect("Error locating ownership information")
+    }
+
     pub fn comments(&self) -> &Option<String> {
         &self.comments
+    }
+}
+
+
+#[derive(Queryable)]
+pub struct OwnerWithUrl {
+    name: String,
+    url: Option<String>,
+    ownership_url: String,
+}
+
+#[juniper::object(description = "Owner of a Journal or Publisher with URL of ownership details")]
+impl OwnerWithUrl {
+    pub fn name(&self) -> &str {
+        self.name.as_str()
+    }
+
+    pub fn url(&self) -> Option<Url> {
+        match &self.url {
+            Some(s) => Url::parse(&s).ok(),
+            None => None,
+        }
+    }
+
+    pub fn ownership_url(&self) -> Option<Url> {
+        Url::parse(&self.ownership_url).ok()
     }
 }
 
@@ -45,7 +83,7 @@ pub struct Owner {
     url: Option<String>,
 }
 
-#[juniper::object(description = "An Owner of a Journal or Publication House")]
+#[juniper::object(description = "Owner of a Journal or Publisher")]
 impl Owner {
     pub fn name(&self) -> &str {
         self.name.as_str()
@@ -67,9 +105,8 @@ pub struct Journal {
     url: Option<String>,
     publisher_id: i32,
     for_profit: bool,
-    publication_model_id: i32,
+    publication_model: PublicationModel,
     comments: Option<String>,
-                                          //TODO: institutional agreements
 }
 
 #[juniper::object(description = "A Journal and its OA/Profit Details")]
@@ -94,29 +131,16 @@ impl Journal {
             .expect("Error locating publisher")
     }
 
-    pub fn owners(&self) -> Vec<Owner> {
+    pub fn owners(&self) -> Vec<OwnerWithUrl> {
         use crate::schema::owners::dsl::*;
         use crate::schema::journal_owners::dsl::*;
         let connection = establish_connection();
         journal_owners
             .inner_join(owners)
             .filter(journal_id.eq(self.id))
-            .select((id, name, url))
-            .load::<Owner>(&connection)
+            .select((name, url, ownership_url))
+            .load::<OwnerWithUrl>(&connection)
             .expect("Error locating ownership information")
-    }
-
-    pub fn ownership_url(&self) -> Vec<String> {
-        use crate::schema::owners::dsl::*;
-        use crate::schema::journal_owners::dsl::*;
-        let connection = establish_connection();
-        let urls: Vec<String> = journal_owners
-            .inner_join(owners)
-            .filter(journal_id.eq(self.id))
-            .select(ownership_url)
-            .load(&connection)
-            .expect("Error locating ownership information");
-        urls //TODO: Parse these to URL types.
     }
 
     pub fn for_profit(&self) -> bool {
@@ -132,14 +156,8 @@ impl Journal {
             .expect("Error locating Fee data")
     }
 
-    pub fn publication_model(&self) -> String {
-        use crate::schema::publication_models::dsl::*;
-        let connection = establish_connection();
-        publication_models
-            .filter(id.eq(&self.publication_model_id))
-            .select(model)
-            .first::<String>(&connection) //TODO: Enum
-            .expect("Error locating Fee data")
+    pub fn publication_model(&self) -> &PublicationModel {
+        &self.publication_model
     }
 
     pub fn categories(&self) -> Vec<String> {
@@ -154,6 +172,19 @@ impl Journal {
             .expect("Error locating Category data")
     }
 
+    pub fn institutional_agreements() -> Vec<JournalAgreement> {
+        use crate::schema::institutional_agreements::dsl::*;
+        use crate::schema::{institutions, journals};
+        let connection = establish_connection();
+        institutional_agreements
+            .inner_join(institutions::table)
+            .inner_join(journals::table)
+            .filter(journal_id.eq(&self.id))
+            .select((institutions::name, agreement, details, url))
+            .load::<JournalAgreement>(&connection)
+            .expect("Error loading Institutional Agreements")
+    }
+
     pub fn comments(&self) -> &Option<String> {
         &self.comments
     }
@@ -166,7 +197,7 @@ pub struct Fee {
     journal_id: i32,
     fee: i32,
     currency_code: String,
-    category_id: i32,
+    category: FeeCategory,
 }
 
 #[juniper::object(description = "Journal fees for various access modes in published currencies")]
@@ -193,14 +224,8 @@ impl Fee {
             .expect("Error locating currency details")
     }
 
-    pub fn category(&self) -> String {
-        use crate::schema::fee_categories::dsl::*;
-        let connection = establish_connection();
-        fee_categories
-            .filter(id.eq(self.category_id))
-            .select(category)
-            .first::<String>(&connection) //TODO: Enum
-            .expect("Error locating fee category")
+    pub fn category(&self) -> &FeeCategory {
+        &self.category
     }
 }
 
@@ -223,6 +248,65 @@ impl Currency {
 
     pub fn name(&self) -> &str {
         self.name.as_str()
+    }
+}
+
+#[derive(Queryable)]
+pub struct JournalAgreement {
+    institution: String,
+    agreement: MaybeLogic,
+    details: Option<String>,
+    url: Option<String>,
+}
+
+#[juniper::object(description = "Agrement between a Journal and Institute")]
+impl JournalAgreement {
+    pub fn institution(&self) -> &str {
+        self.institution.as_str()
+    }
+
+    pub fn agreement(&self) -> &MaybeLogic {
+        &self.agreement
+    }
+
+    pub fn details(&self) -> &Option<String> {
+        &self.details
+    }
+
+    pub fn url(&self) -> &Option<String> {
+        &self.url
+    }
+}
+
+#[derive(Queryable)]
+pub struct Agreement {
+    institution: String,
+    journal: String,
+    agreement: MaybeLogic,
+    details: Option<String>,
+    url: Option<String>,
+}
+
+#[juniper::object(description = "Agrement between a Journal and Institute")]
+impl Agreement {
+    pub fn institution(&self) -> &str {
+        self.institution.as_str()
+    }
+
+    pub fn journal(&self) -> &str {
+        self.journal.as_str()
+    }
+
+    pub fn agreement(&self) -> &MaybeLogic {
+        &self.agreement
+    }
+
+    pub fn details(&self) -> &Option<String> {
+        &self.details
+    }
+
+    pub fn url(&self) -> &Option<String> {
+        &self.url
     }
 }
 
@@ -282,6 +366,18 @@ impl QueryRoot {
             .limit(100)
             .load::<Fee>(&connection)
             .expect("Error loading OA Fees")
+    }
+    fn institutional_agreements() -> Vec<Agreement> {
+        use crate::schema::institutional_agreements::dsl::*;
+        use crate::schema::{institutions, journals};
+        let connection = establish_connection();
+        institutional_agreements
+            .inner_join(institutions::table)
+            .inner_join(journals::table)
+            .select((institutions::name, journals::name, agreement, details, url))
+            .limit(100)
+            .load::<Agreement>(&connection)
+            .expect("Error loading Institutional Agreements")
     }
     fn categories() -> Vec<Category> {
         use crate::schema::categories::dsl::*;
