@@ -4,6 +4,7 @@ use juniper::GraphQLEnum;
 #[DieselType = "Publication_model"]
 pub enum PublicationModel {
     Subscription, //Closed, not OA
+    Archive, //Not currently accepting submissions.
     BronzeOpenAccess, //Delayed OA, Closed for a period of time, then released as OA in some form
     HybridOpenAccess, //'Open Choice' puts burden on authors to pay for open access, otherwise closed
     GreenOpenAccess, //Allows self-archiving of authors work outside of the journals garden
