@@ -1,6 +1,6 @@
 --LANGUAGE plpgsql;
-DROP TRIGGER publication_model_check ON fees;
-DROP FUNCTION publication_model_check;
+DROP TRIGGER agreement_url_check ON institutional_agreements;
+DROP FUNCTION agreement_url_check;
 DROP TYPE maybe_logic cascade ;
 DROP TYPE publication_model cascade;
 DROP TYPE fee_category cascade;
@@ -14,3 +14,5 @@ DROP TABLE institutions cascade;
 DROP TABLE currencies;
 DROP TABLE journal_categories;
 DROP TABLE publisher_owners;
+DROP TABLE journal_owners;
+DROP TABLE publication_models;

@@ -36,9 +36,9 @@ table! {
     use diesel::sql_types::*;
     use crate::enums::*;
 
-    institutional_agreements (institution_id, journal_id) {
+    institutional_agreements (institution_id, publisher_id) {
         institution_id -> Int4,
-        journal_id -> Int4,
+        publisher_id -> Int4,
         agreement -> Maybe_logic,
         details -> Nullable<Varchar>,
         url -> Nullable<Varchar>,
@@ -70,13 +70,22 @@ table! {
     use diesel::sql_types::*;
     use crate::enums::*;
 
+    journal_owners (journal_id, owner_id) {
+        journal_id -> Int4,
+        owner_id -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::enums::*;
+
     journals (id) {
         id -> Int4,
         name -> Varchar,
         url -> Nullable<Text>,
         publisher_id -> Int4,
         for_profit -> Bool,
-        publication_model -> Publication_model,
         comments -> Nullable<Text>,
     }
 }
@@ -88,8 +97,18 @@ table! {
     owners (id) {
         id -> Int4,
         name -> Varchar,
-        publisher_ownership_url -> Nullable<Text>,
+        ownership_url -> Nullable<Text>,
         comments -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::enums::*;
+
+    publication_models (journal_id, publication_model) {
+        journal_id -> Int4,
+        publication_model -> Publication_model,
     }
 }
 
@@ -118,10 +137,13 @@ table! {
 joinable!(fees -> currencies (currency_code));
 joinable!(fees -> journals (journal_id));
 joinable!(institutional_agreements -> institutions (institution_id));
-joinable!(institutional_agreements -> journals (journal_id));
+joinable!(institutional_agreements -> publishers (publisher_id));
 joinable!(journal_categories -> categories (category_id));
 joinable!(journal_categories -> journals (journal_id));
+joinable!(journal_owners -> journals (journal_id));
+joinable!(journal_owners -> owners (owner_id));
 joinable!(journals -> publishers (publisher_id));
+joinable!(publication_models -> journals (journal_id));
 joinable!(publisher_owners -> owners (owner_id));
 joinable!(publisher_owners -> publishers (publisher_id));
 
@@ -132,8 +154,10 @@ allow_tables_to_appear_in_same_query!(
     institutional_agreements,
     institutions,
     journal_categories,
+    journal_owners,
     journals,
     owners,
+    publication_models,
     publisher_owners,
     publishers,
 );
