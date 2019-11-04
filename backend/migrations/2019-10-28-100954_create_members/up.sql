@@ -89,10 +89,10 @@ CREATE TABLE journal_categories (
 );
 
 CREATE TABLE publication_models (
-    journal_id INT NOT NULL,
+    publisher_id INT NOT NULL,
     publication_model publication_model NOT NULL,
-    FOREIGN KEY (journal_id) REFERENCES journals(id),
-    PRIMARY KEY (journal_id, publication_model)
+    FOREIGN KEY (publisher_id) REFERENCES publishers(id),
+    PRIMARY KEY (publisher_id, publication_model)
 );
 
 CREATE TABLE institutions (
@@ -198,29 +198,23 @@ INSERT INTO journals(name, url, publisher_id, for_profit) VALUES ('New Journal o
     ('Environmental Research Letters', 'https://iopscience.iop.org/journal/1748-9326', 1, False),
     ('Engaging Science, Technology and Society', 'https://estsjournal.org/index.php/ests', 16, False),
     ('International Journal of Communication', 'https://ijoc.org/index.php/ijoc', 2, False);
-INSERT INTO publication_models(journal_id, publication_model) VALUES
+INSERT INTO publication_models(publisher_id, publication_model) VALUES
     (1, 'gold_open_access'),
-    (2, 'hybrid_open_access'), (2, 'gold_open_access'), (2, 'green_open_access'), (2, 'subscription'),
-    (3, 'hybrid_open_access'), (3, 'gold_open_access'), (3, 'subscription'),
-    (4, 'gold_open_access'),
-    (5, 'green_open_access'), (5, 'gold_open_access'),
-    (6, 'hybrid_open_access'), (6, 'gold_open_access'), (6, 'subscription'),
+    (2, 'platinum_open_acess'),
+    (3, 'hybrid_open_access'), (3, 'gold_open_access'), (3, 'green_open_access'), (3, 'subscription'),
+    (4, 'hybrid_open_access'), (4, 'gold_open_access'), (4, 'subscription'),
+    (5, 'gold_open_access'),
+    (6, 'green_open_access'), (6, 'gold_open_access'),
     (7, 'gold_open_access'),
     (8, 'hybrid_open_access'), (8, 'gold_open_access'), (8, 'subscription'),
     (9, 'archive'),
     (10, 'hybrid_open_access'), (10, 'gold_open_access'), (10, 'subscription'),
-    (11, 'hybrid_open_access'), (11, 'gold_open_access'), (11, 'subscription'),
-    (12, 'platinum_open_acess'),
-    (13, 'hybrid_open_access'), (13, 'gold_open_access'), (13, 'green_open_access'), (13, 'subscription'),
-    (14, 'hybrid_open_access'), (14, 'gold_open_access'), (14, 'subscription'),
-    (15, 'platinum_open_acess'),
-    (16, 'gold_open_access'),
-    (17, 'hybrid_open_access'), (17, 'gold_open_access'), (17, 'subscription'),
-    (18, 'hybrid_open_access'), (18, 'gold_open_access'), (18, 'green_open_access'), (18, 'subscription'),
-    (19, 'hybrid_open_access'), (19, 'gold_open_access'), (19, 'green_open_access'), (19, 'subscription'),
-    (20, 'gold_open_access'),
-    (21, 'platinum_open_acess'),
-    (22, 'platinum_open_acess');
+    (11, 'platinum_open_acess'),
+    (12, 'hybrid_open_access'), (12, 'gold_open_access'), (12, 'subscription'),
+    (13, 'platinum_open_acess'),
+    (14, 'gold_open_access'),
+    (15, 'hybrid_open_access'), (15, 'gold_open_access'), (15, 'green_open_access'), (15, 'subscription'),
+    (16, 'platinum_open_acess');
 
 INSERT INTO fees(journal_id, fee, currency_code, category) VALUES (1, 1400, 'GBP', 'article_processing_charge'), (1, 1600, 'EUR', 'article_processing_charge'), (1, 2100, 'USD', 'article_processing_charge'),
     (2, 3000, 'USD', 'article_processing_charge'),

@@ -47,6 +47,17 @@ impl Publisher {
             .expect("Error locating ownership information")
     }
 
+    /// What publication models does this publisher provide?
+    pub fn publication_models(&self) -> Vec<PublicationModel> {
+        use crate::schema::publication_models::dsl::*;
+        let connection = establish_connection();
+        publication_models
+            .filter(publisher_id.eq(self.id))
+            .select(publication_model)
+            .load::<PublicationModel>(&connection)
+            .expect("Error locating publication model information")
+    }
+
     /// Any additional comments about this publisher that may be pertinent
     pub fn comments(&self) -> &Option<String> {
         &self.comments
@@ -161,17 +172,6 @@ impl Journal {
             .filter(journal_id.eq(self.id))
             .load::<Fee>(&connection)
             .expect("Error locating Fee data")
-    }
-
-    /// What publication models does this journal provide?
-    pub fn publication_models(&self) -> Vec<PublicationModel> {
-        use crate::schema::publication_models::dsl::*;
-        let connection = establish_connection();
-        publication_models
-            .filter(journal_id.eq(self.id))
-            .select(publication_model)
-            .load::<PublicationModel>(&connection)
-            .expect("Error locating publication model information")
     }
 
     /// A list of categories this journal caters for

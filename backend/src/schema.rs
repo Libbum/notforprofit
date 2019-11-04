@@ -106,8 +106,8 @@ table! {
     use diesel::sql_types::*;
     use crate::enums::*;
 
-    publication_models (journal_id, publication_model) {
-        journal_id -> Int4,
+    publication_models (publisher_id, publication_model) {
+        publisher_id -> Int4,
         publication_model -> Publication_model,
     }
 }
@@ -143,7 +143,7 @@ joinable!(journal_categories -> journals (journal_id));
 joinable!(journal_owners -> journals (journal_id));
 joinable!(journal_owners -> owners (owner_id));
 joinable!(journals -> publishers (publisher_id));
-joinable!(publication_models -> journals (journal_id));
+joinable!(publication_models -> publishers (publisher_id));
 joinable!(publisher_owners -> owners (owner_id));
 joinable!(publisher_owners -> publishers (publisher_id));
 
